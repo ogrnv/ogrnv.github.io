@@ -1,2 +1,2 @@
 # ogrnv.github.io
-Random Intelligence Test for AI
+A buttons version of Random Intelligence Test for AI
