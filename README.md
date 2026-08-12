@@ -1,5 +1,5 @@
 # ogrnv.github.io
-**A buttons versions of Random Intelligence Test for AI**
+**Buttons versions of Random Intelligence Test for AI**
 
 rit-lf.html - a less formal version was tested using WebBrain, a browser extension that acts as an AI agent, on August 11, 2026 with the result:\
 **Moves/Steps=2**\
