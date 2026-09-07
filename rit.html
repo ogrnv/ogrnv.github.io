@@ -2,13 +2,14 @@
 <script>
 let
 hm=8,	//size of a side of square table/board.
-kcb=3,	//how many of one digit types of chips are placed on the table	
+kcb=2,	//how many of one digit types of chips are placed on the table	
 emb=22,	//number of empty sells 22=64-42
-rnd=2,	//rounds number
+rnd=5,	//rounds number
 stp=6;	//number of steps in a round 
 mn=0,	//moves number
 qn=0,	//number of finished lines >4 chips long
-u=false;//statistic test mode 
+u=false,//statistic test mode
+p=1;	//1 - input in pairs
 
 </script>
 <head>
@@ -50,7 +51,7 @@ a:link, a:visited {
 <p align=left class=F16 id="INFO"></p>
 
 <script>
-let fc=false, alcl=1, i, j, ti=-1, tj=-1, tz, sha=0, rd=0,
+let np=0, fc=false, alcl=1, i, j, ti=-1, tj=-1, tz, sha=0, rd=0,
 xx="", xf="", xxx="", s="", inpr="",ise,jse,bn,
 ina, jna, iko, jko, ox5=0, hmb, bc, csx="", tbx="",
 n5 = [], Csa = [], Csb = [], TC = [],
@@ -66,7 +67,7 @@ for (i = 0; i < hm; i++){
 for (i = 0; i < 5; i++){n5[i] = 0;}
 document.getElementById("MANUAL").innerHTML = `Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">Source https://ogrnv.github.io/rit.html</a><br><br>
 There is only one player in the game - you, so you should take the first move!<br><br>
-Let TB be given board with chips or the board with chips after your move(s), TB[address] be an integer assigned to a cell with the address: zero mean an empty cell, non-zero mean a chip marked with the integer on the cell.<br><br>
+Let TB be given <b><span id="HMm"></span></b> board with chips or the board with chips after your move(s), TB[address] be an integer assigned to a cell with the address: zero mean an empty cell, non-zero mean a chip marked with the integer on the cell.<br><br>
 Let EM be a relocation of a chip to a horizontally or vertically adjacent zero cell. As a result of this relocation, the values ​​of TB[from] and TB[to] should swap.<br><br>
 Every game move must be either an EM or a sequence of several EMs. Let the move start address be SA and the move finish address be FA. Please note: FA must not be equal to SA. Let move number be MN.
 <br><br>
@@ -127,8 +128,10 @@ let s = ""; //for (i=0; i<hm; i++) s=s+Csb[i]+"<br>";
 //document.getElementById("CELLS").innerHTML = s;
 if(stp>1){s = "The next five chips: "; for (i=0; i<4; i++) s=s+n5[i]+","; s=s+n5[4]; document.getElementById("NEXT5").innerHTML = s;}
 if(mn==0) {
-	document.getElementById("INFO").innerHTML = info;	
-	document.getElementById("HM").innerHTML = hm;
+	document.getElementById("OUT").innerHTML = "Moves 0<br>";
+	document.getElementById("INFO").innerHTML = info;
+	document.getElementById("HM").innerHTML = hm + "x" + hm;
+	document.getElementById("HMm").innerHTML = hm + "x" + hm;
 	document.getElementById("EMB").innerHTML = emb;
 	document.getElementById("KCB").innerHTML = kcb;
 	document.getElementById("STEPSS").innerHTML = stp;
@@ -315,9 +318,9 @@ function subs(strx, find, replace){
     return strx.replace(new RegExp(escapedFind, 'g'), replace);
 }
 function mbo(i, j){
-if(alcl==1){		
-	alcl=0;
-	if(Csb[i][j]==0){if(fc==false){alcl=1; return;}}
+if(alcl==1){ //	allow to process next click
+  alcl=0; //disallow clics immediately	
+	if(Csb[i][j]==0){if(fc==false){alcl=1; return;}} //fc - first click
 	else{ti=i;tj=j;tz=Csb[i][j];fc=true; alcl=1; return;}
 	
   for(x=0; x<hm; x++){TC[x] = []; for(y=0; y<hm; y++) TC[x][y] = 0;}
@@ -343,12 +346,12 @@ if(ox5>0)
 	else {
 		if(rd+1 == rnd){ u=false;
 		xf="<b>The game is over. Many thanks!<br>Moves per step: " + mn/(stp*rnd) + "</b> <br>";
-	document.getElementById("INFO").innerHTML = info;
-	document.getElementById("HM").innerHTML = hm;
+	document.getElementById("INFO").innerHTML = info;		
+	document.getElementById("HM").innerHTML = hm + "x" + hm;
 	document.getElementById("EMB").innerHTML = emb;
 	document.getElementById("KCB").innerHTML = kcb;
 	document.getElementById("STEPSS").innerHTML = stp;
-	document.getElementById("RNDs").innerHTML = rnd;
+	document.getElementById("RNDs").innerHTML = rnd;	
 		alcl=0;}
 		else{
 			rd++; qn=0; newdesk();
@@ -359,10 +362,12 @@ if(ox5>0)
 		}
 	}
 }
-if(xf=="") xx="Finished " +qn+ " step(s) in round " + (rd+1) +"<br>Moves " + mn + "<br>";
+if(xf=="") {xx="Finished " +qn+ " step(s) in round " + (rd+1) +"<br>Moves " + mn + "<br>Verified board:<br>";
+for (i=0; i<hm; i++) xx=xx+Csb[i]+"<br>";
+}
 else xx = xf+ "Moves " + mn + ", total steps " +(stp*rnd)+ "<br>";
 document.getElementById("OUT").innerHTML = xx;
-if(xf!="") exit;
+if(xf!="") {btn.removeEventListener('click',arguments.callee,false); exit;}
 }
 alcl=1;
 }
@@ -371,7 +376,12 @@ alcl=1;
     const target = e.target;
     if (target.matches('button.button')) {
       const w = target.dataset.index;
-		  j=w%hm; i=(w - j)/hm;
+		  j=w%hm; i=(w - j)/hm; //alert(i + ' ' + j);
+		  if(p) { //input in pairs
+			np++; //number in pair
+			if(np==3) np=1;
+			if(np==1) {alcl=1; fc=0;} //first click
+		  }
 		  mbo(i, j);
 	  }      
   });
