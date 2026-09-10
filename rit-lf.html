@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <script>
-let
+const
 hm=8,	//size of a side of square table/board.
-kcb=2,	//how many of one digit types of chips are placed on the table	
+kcb=3,	//how many of one digit types of chips are placed on the table	
 emb=22,	//number of empty sells 22=64-42
 rnd=5,	//rounds number
 stp=6;	//number of steps in a round 
-mn=0,	//moves number
-qn=0,	//number of finished lines >4 chips long
-u=false,//statistic test mode
-p=1;	//1 - input in pairs
+p=0,	//1 - input in pairs and printing states of the board
+u=false;//statistic test mode
 
 </script>
 <head>
@@ -51,6 +49,8 @@ a:link, a:visited {
 <p align=left class=F16 id="INFO"></p>
 
 <script>
+let mn=0,	//moves number
+qn=0;		//number of finished lines >4 chips long
 let np=0, fc=false, alcl=1, i, j, ti=-1, tj=-1, tz, sha=0, rd=0,
 xx="", xf="", xxx="", s="", inpr="",ise,jse,bn,
 ina, jna, iko, jko, ox5=0, hmb, bc, csx="", tbx="",
@@ -67,16 +67,17 @@ for (i = 0; i < hm; i++){
 for (i = 0; i < 5; i++){n5[i] = 0;}
 document.getElementById("MANUAL").innerHTML = `Let’s play RIT:<br><a href="https://ogrnv.github.io/rit-lf.html" target="_blank">Source https://ogrnv.github.io/rit-lf.html</a><br><br>
 You are the sole player and must move first.<br><br>
-Goal: On a<b><span id="HMm"></span></b> board, form straight lines of at least five identical non‑zero chips (horizontal, vertical, or diagonal) in as few total moves as possible. Longer lines do not improve the result.<br>&nbsp;<br>
+Goal: On a <b><span id="HMm"></span></b> board, form straight lines of at least five identical non‑zero chips (horizontal, vertical, or diagonal) in as few total moves as possible. Longer lines do not increase the assessment.<br>&nbsp;<br>
 Game flow:<br>
 - <b><span id="RNDn"></span></b> round(s) in the game;<br>
 - <b><span id="STEPS"></span></b> step(s) in a round;<br>
 - each step ends when YOU by your move complete a line of five or more, then five chips of them turn to zero and five new non‑zero chips (shown below the buttons) appear in place of randomly chosen zero chips;<br>
+- it is forbidden to move a chip across two non-zero chips positioned diagonally adjacent to each other;<br>
 - after a round, chips will get new markings.<br>&nbsp;<br>
 Making a chip (all chips are represented by the buttons) move:<br>
 1. Press a non‑zero chip.<br>
 2. Press a zero chip.<br>
-3. If no zero‑chip path exists between the two chips or the above item(s) is/are incorrect, the "Moves" counter stays unchanged.<br>In these two examples there are no zero paths: 10|01 01|10 if | means a new line.<br>
+3. If no zero‑chip path exists between the two chips or the above item(s) is/are incorrect, the "Moves" counter stays unchanged. Else, the markings on the chips/buttons change to some extent.<br>
 Continue until the "Game is over" message appears.<br><p align=left class=F16> 
 The board with chips is:<br>`;
 	
@@ -362,8 +363,11 @@ if(ox5>0)
 		}
 	}
 }
-if(xf=="") {xx="Finished " +qn+ " step(s) in round " + (rd+1) +"<br>Moves " + mn + "<br>Verified board:<br>";
-for (i=0; i<hm; i++) xx=xx+Csb[i]+"<br>";
+if(xf=="") {xx="Finished " +qn+ " step(s) in round " + (rd+1) +"<br>Moves " + mn + "<br>";
+if(p==1) {	
+	xx = xx + "Verified board:<br>";
+	for (i=0; i<hm; i++) xx=xx+Csb[i]+"<br>";
+}
 }
 else xx = xf+ "Moves " + mn + ", total steps " +(stp*rnd)+ "<br>";
 document.getElementById("OUT").innerHTML = xx;
