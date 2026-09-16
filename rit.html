@@ -2,11 +2,11 @@
 <script>
 const
 hm=8,	//size of a side of square table/board.
-kcb=3,	//how many of one digit types of chips are placed on the table	
+kcb=2,	//how many of one digit types of chips are placed on the table	
 emb=22,	//number of empty sells 22=64-42
-rnd=5,	//rounds number
-stp=6;	//number of steps in a round 
-p=0,	//1 - input in pairs and printing states of the board
+rnd=2,	//rounds number
+stp=2;	//number of steps in a round 
+p=1,	//1 - input in pairs and printing states of the board
 u=false;//statistic test mode
 
 </script>
@@ -22,6 +22,7 @@ font-size:16px;
 width:  100%;
 height: 100%;
 }
+button {height: 7%;width:7%;aspect-ratio:1;font-size: 16pt;}
 a:link, a:visited {
   color: #0FF;
   text-align: center;
@@ -30,6 +31,7 @@ a:link, a:visited {
 }
 .f16 {font-size: 16pt; color:  #0F0;}
 .F16 {font-size: 16pt; color:  #0FF;}
+
 </style> 
 <body>
 <table width=100% heigth=100%>
@@ -41,18 +43,33 @@ a:link, a:visited {
 <p align=left class=f16 id="MANUAL"></p>
 
 <p align=left class=F16 id="CELLS"></p>
-<div id="bs"></div>
-<p align=left class=F16><span id="NEXT5"></span></p>
-<p align=left class=F16 id="OUT"></p>
-<p align=left class=f16>
-</p>
-<p align=left class=F16 id="INFO"></p>
 
+<p align=left class=F16 id="OUT"></p>
+<!--p hidden align=left class=F16 id="NEXT5"></p-->
+<div class=f16>
+<p align=left>
+<h3 id="constants-and-initial-state">Constants and Current State</h3>
+<ul>
+<li><strong>Board (<code>BRD</code>) Dimensions:</strong> <span id="HM"></span></li>
+<li><strong>Number of Types of Chips:</strong> <span id="KCB"></span></li>
+<li><strong>Empty Cells Number:</strong> <span id="EMB"></span></li>
+<li><strong>Steps Per Round:</strong> <span id="STEPS"></span></li>
+<li><strong>Target Rounds:</strong> <span id="RNDs"></span></li>
+<li><strong>Current Progress:<ul>
+<div hidden id="GO"><li><strong>The game is over. Many thanks!</strong></li></div>
+<li>Moves</strong> = <span id="MVs"></span>,<li><span id="CSTEPS"></span> <strong>Steps are completed in the Round</strong> <span id="RNDn"></span></li></li></li></ul>
+<li><strong>Current Board (<code>BRD</code>):
+<div id="bs"></div></strong></li>
+<li><strong>The Next Five Chips(<code>NEXT5</code>):</strong> <span id="NEXT5"></span></li>
+</ul>
+</p></div>
+<p align=left class=f16></p><p align=left class=F16 id="INFO"></p>
 <script>
+document.getElementById("CSTEPS").innerHTML = 0;
 let mn=0,	//moves number
 qn=0;		//number of finished lines >4 chips long
 let np=0, fc=false, alcl=1, i, j, ti=-1, tj=-1, tz, sha=0, rd=0,
-xx="", xf="", xxx="", s="", inpr="",ise,jse,bn,
+xx="", xf="", xxx="", s="", inpr="",ise,jse,bn,sn5="",
 ina, jna, iko, jko, ox5=0, hmb, bc, csx="", tbx="",
 n5 = [], Csa = [], Csb = [], TC = [],
 	x0 = -1, x1 = -1, y0 = -1, y2 = -1; //0-start address 1-finish one
@@ -65,26 +82,92 @@ for (i = 0; i < hm; i++){
 }
 
 for (i = 0; i < 5; i++){n5[i] = 0;}
-document.getElementById("MANUAL").innerHTML = `Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">Source https://ogrnv.github.io/rit.html</a><br><br>
-There is only one player in the game - you, so you should take the first move!<br><br>
-Let TB be given <b><span id="HMm"></span></b> board with chips or the board with chips after your move(s), TB[address] be an integer assigned to a cell with the address: zero mean an empty cell, non-zero mean a chip marked with the integer on the cell.<br><br>
-Let EM be a relocation of a chip to a horizontally or vertically adjacent zero cell. As a result of this relocation, the values ​​of TB[from] and TB[to] should swap.<br><br>
-Every game move must be either an EM or a sequence of several EMs. Let the move start address be SA and the move finish address be FA. Please note: FA must not be equal to SA. Let move number be MN.
-<br><br>
-The goal of the game is to complete it in the fewest number of moves. The game ends after <b><span id="RNDn"></span> round(s), each consisting of <span id="STEPS"></span> step(s)</b>.
-A step ends when YOU by your last move, complete a formation of a straight horizontal or vertical or diagonal line of five or more chips with the same marking. Once the step is completed, the TB will have these updates:
- five successive chips are removed from the line (for cases with long or/and several line(s) it is done randomly), then five previously presented chips are randomly added to the empty cells of the board.
-<br><br>In the buttons version:<br>
- to make a move, press a button representing a SA chip, then press a FA button with a zero mark. In case of a move error, the MN number  after "Moves" does not change.<br>
-Please note that the markings on the chips/buttons change to some extent after each change in the "Moves" counter.<br>
-Make moves until "The game is over" message appears.<br><p align=left class=F16> 
-The board with chips is:<br>`;
-	
-let info=`Board size=<span id="HM"></span><br>
-Empty cells number=<span id="EMB"></span><br>
-Number of types of chips=<span id="KCB"></span><br>
-Rounds number=<span id="RNDs"></span><br>
-Steps in one round=<span id="STEPSS"></span><br></b><br><br>`;
+
+<!-- use a md to html converter
+document.getElementById("MANUAL").innerHTML = `
+Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">Source https://ogrnv.github.io/rit.html</a><br><br>
+<h3 id="game-overview--role">Game Overview &amp; Role</h3>
+<p>You are the sole player in a grid-based puzzle game. You make the first move.<br>Your goal is to complete the target number of <strong>Rounds</strong> in the fewest total <strong>Moves</strong> possible.</p><hr>
+<h3 id="grid--coordinate-system">Grid &amp; Coordinate System</h3>
+<ul>
+<li>The board (<code>BRD</code>) is a 2D grid.</li>
+<li>A cell address is formatted as <code>[row, col]</code>, both indexed from <code>0</code>.</li>
+<li>Cell values:<ul>
+<li><code>0</code>: Empty cell.</li>
+<li>An integer <code>&gt; 0</code>: A chip marked with that integer (representing its color/type).</li>
+</ul>
+</li>
+</ul><hr>
+<h3 id="movement-rules">Movement Rules</h3>
+<p>A single <strong>Move</strong> consists of relocating one chip from a start address (<code>SA</code>) to a finish address (<code>FA</code>):</p>
+<ol>
+<li><code>BRD[SA]</code> must contain a chip (value <code>&gt; 0</code>).</li>
+<li><code>BRD[FA]</code> must be empty (value <code>0</code>).</li>
+<li><code>SA</code> cannot equal <code>FA</code>.</li>
+<li>Think about the next moves, not the ones left in the past.  </li>
+<li><strong>Relocation Path Requirement</strong>: There must be an unobstructed orthogonal path (up, down, left, right) connecting <code>SA</code> to <code>FA</code>, consisting of <strong>zero or more empty cells</strong> between <code>SA</code> and <code>FA</code>.</li>
+</ol>
+<hr>
+<h3 id="rounds-steps--win-condition">Rounds, Steps &amp; Win Condition</h3>
+<ul>
+<li><p>A <strong>Step</strong> is completed when <strong>your move</strong> creates a straight line (horizontal, vertical, or diagonal) of <strong>5 or more identical chips</strong>.</p>
+</li>
+<li><p>A step can consist of one or more moves.</p>
+</li>
+<li><p>Any completed Round consists of <strong>Steps Per Round</strong> steps.</p>
+</li>
+<li><p>When a Step is complete but the Round has not yet ended, the host performs the following actions:</p>
+<ol>
+<li>Five successive chips on the line are cleared (for cases with long or/and several line(s) five successive chips are chosen randomly).</li>
+<li>Five previewed chips from <code>NEXT5</code> are placed randomly onto free <code>BRD</code> cells.</li>
+</ol>
+</li>
+<li><p>After both Step and Round have been completed, the host performs the following actions:<br><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</p>
+</li>
+<li><p>The game ends after the completion of the last step in the last of the target <strong>rounds</strong>.</p>
+</li>
+</ul>
+<hr>
+<h3 id="host-messages">Host Messages</h3>
+<p>After each move, wait for a message from the host:</p>
+<ul>
+<li>Status lines indicating the number of moves, steps, rounds.
+<li>A verified board you must use as the BRD.
+<li>If necessary:<ul><li>five new random chips(NEXT5).
+<li>The game is over.</li></ul>
+<!--li>The host increments the <code>Moves</code> counter: Move is accepted.</li>
+<li><code>Moves</code> counter remain unchanged for up to 10 seconds: Move is rejected. Try a different move.</li-->
+</ul>
+<hr>
+<h3 id="strict-output-constraints">Strict Output Constraints</h3>
+<p>For <strong>EVERY</strong> response, you must output <strong>ONLY</strong> a single line conforming to this exact regex:<code>\/&lt;p&gt;RN=\\d+\\sSA=\\[\\d+,\\d+\\]\\sFA=\\[\\d+,\\d+\\]&lt;\/p&gt;\/</code></p>
+<ul>
+<li><strong>RN</strong>: Your response number. Start at <code>1</code> and increment by <code>1</code> on every subsequent message (e.g., <code>RN=1</code>, <code>RN=2</code>, ...).</li>
+<li><strong>SA</strong>: Move starting cell <code>[row, col]</code>.</li>
+<li><strong>FA</strong>: Move destination cell <code>[row, col]</code>.<br><strong>Format example:</strong></li>
+</ul>
+<p>RN=5 SA=[1,2] FA=[3,4]</p>
+<p><strong>CRITICAL:</strong> Output <strong>NO</strong> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p><hr>
+
+`;	
+let info=`
+<h3>In this buttons version:</h3>
+<h4> To make a move, press a button representing a SA chip, then press a FA button with a zero mark.</h4>
+<p class=f16><strong>Submit your first move now.</strong></p>
+<br><br>`;
+function handleClick(e) {// handler as a named function
+  const target = e.target;
+  if (target.matches('button.button')) {
+    const w = target.dataset.index;
+    j = w % hm;    i = (w - j) / hm; //alert(i + ' ' + j);
+    if(p) { //input in pairs
+      np++; //number in pair
+      if(np==3) np=1;
+      if(np==1) {alcl=1; fc=0;} //first click
+    }
+    mbo(i, j);
+  }}
+
 function random(min, max) {
 let mi = Math.ceil(min), ma = Math.floor(max);
 return Math.floor(Math.random()*(ma-mi+1)+mi);
@@ -126,18 +209,20 @@ while(n<5){
 */
 let s = ""; //for (i=0; i<hm; i++) s=s+Csb[i]+"<br>";
 //document.getElementById("CELLS").innerHTML = s;
-if(stp>1){s = "The next five chips: "; for (i=0; i<4; i++) s=s+n5[i]+","; s=s+n5[4]; document.getElementById("NEXT5").innerHTML = s;}
+if(stp>1){for (i=0; i<4; i++) s=s+n5[i]+","; s=s+n5[4];
+	sn5=s;
+	document.getElementById("NEXT5").innerHTML = s;}
 if(mn==0) {
-	document.getElementById("OUT").innerHTML = "Moves 0<br>";
+	document.getElementById("MVs").innerHTML = mn;
 	document.getElementById("INFO").innerHTML = info;
 	document.getElementById("HM").innerHTML = hm + "x" + hm;
-	document.getElementById("HMm").innerHTML = hm + "x" + hm;
+//	document.getElementById("HMm").innerHTML = hm + "x" + hm;
 	document.getElementById("EMB").innerHTML = emb;
 	document.getElementById("KCB").innerHTML = kcb;
-	document.getElementById("STEPSS").innerHTML = stp;
+//	document.getElementById("STEPSS").innerHTML = stp;
 	document.getElementById("RNDs").innerHTML = rnd;
 	document.getElementById("STEPS").innerHTML = stp;
-	document.getElementById("RNDn").innerHTML = rnd;
+	document.getElementById("RNDn").innerHTML = 1;
 
 	}
 }
@@ -331,30 +416,35 @@ if(alcl==1){ //	allow to process next click
 	pom(i,j,Csb[ti][tj]);
 	pom(ti,tj,0);
 	ValuX(Csb[i][j], i, j);
-mn++; if(mn==1){document.getElementById("MANUAL").innerHTML = "";document.getElementById("INFO").innerHTML = "";}
+mn++;
+if(mn%500000 == 0.0) alert(' ');//memory clearing pause
+document.getElementById("MVs").innerHTML = mn;
+if(mn==1){document.getElementById("MANUAL").innerHTML = "";document.getElementById("INFO").innerHTML = "";}
 if(ox5>0)
 {
 	qn++;
-	if(qn<stp) {
+	if(qn<stp) {// no end of step
 		n=0;
 		while(n<5){n5[n]=random(1, kcb);n++;}
-		s = "The next five chips: "; for (i=0; i<4; i++) s=s+n5[i]+",";
-		s=s+n5[4];
-		if(qn==(stp - 1)) s="";
-		 document.getElementById("NEXT5").innerHTML = s;
+		sn5 = "";
+		for (i=0; i<4; i++) sn5=sn5+n5[i]+",";
+		sn5=sn5+n5[4];
+		if(qn==(stp - 1)) sn5="unnecessary";
+		document.getElementById("CSTEPS").innerHTML = qn;
+		document.getElementById("NEXT5").innerHTML = sn5;
 	}
 	else {
 		if(rd+1 == rnd){ u=false;
-		xf="<b>The game is over. Many thanks!<br>Moves per step: " + mn/(stp*rnd) + "</b> <br>";
-	document.getElementById("INFO").innerHTML = info;		
-	document.getElementById("HM").innerHTML = hm + "x" + hm;
-	document.getElementById("EMB").innerHTML = emb;
-	document.getElementById("KCB").innerHTML = kcb;
-	document.getElementById("STEPSS").innerHTML = stp;
-	document.getElementById("RNDs").innerHTML = rnd;	
-		alcl=0;}
+		document.getElementById('GO').hidden = false;
+		xf="<b>The game is over. Many thanks!<br>Moves per step: " + mn/(stp*rnd) + "</b> <br>"; alcl=0;
+		document.getElementById("CSTEPS").innerHTML = qn;
+		btn.removeEventListener('click', handleClick);		
+		}
 		else{
-			rd++; qn=0; newdesk();
+			rd++;
+			document.getElementById("RNDn").innerHTML = rd+1;
+			qn=0; document.getElementById("CSTEPS").innerHTML = qn;
+			newdesk();
 			for (let i = 0; i < hm; i++) {
 			for (let j = 0; j < hm; j++){
 			bm(i, j, Csb[i][j]);
@@ -362,32 +452,23 @@ if(ox5>0)
 		}
 	}
 }
-if(xf=="") {xx="Finished " +qn+ " step(s) in round " + (rd+1) +"<br>Moves " + mn + "<br>";
+
+if(xf=="") {
+	xx=qn + " steps are completed in round " + (rd+1) + "<br>Moves " + mn + "<br>";
 if(p==1) {	
 	xx = xx + "Verified board:<br>";
 	for (i=0; i<hm; i++) xx=xx+Csb[i]+"<br>";
+	document.getElementById("NEXT5").innerHTML = sn5;
 }
 }
 else xx = xf+ "Moves " + mn + ", total steps " +(stp*rnd)+ "<br>";
 document.getElementById("OUT").innerHTML = xx;
-if(xf!="") {btn.removeEventListener('click',arguments.callee,false); exit;}
+if(xf!="") { exit;}
 }
 alcl=1;
 }//if(alcl==1)
 }
-  btn.addEventListener('click', e => {
-    const target = e.target;
-    if (target.matches('button.button')) {
-      const w = target.dataset.index;
-		  j=w%hm; i=(w - j)/hm; //alert(i + ' ' + j);
-		  if(p) { //input in pairs
-			np++; //number in pair
-			if(np==3) np=1;
-			if(np==1) {alcl=1; fc=0;} //first click
-		  }
-		  mbo(i, j);
-	  }      
-  });
+btn.addEventListener('click', handleClick);
 while(u){
 	i=random(0, hm - 1);
 	j=random(0, hm - 1);
