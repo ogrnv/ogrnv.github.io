@@ -6,7 +6,7 @@ kcb=2,	//how many of one digit types of chips are placed on the table
 emb=22,	//number of empty sells 22=64-42
 rnd=2,	//rounds number
 stp=2;	//number of steps in a round 
-p=1,	//1 - input in pairs and printing states of the board
+p=0,	//1 - input in pairs and printing states of the board
 u=false;//statistic test mode
 
 </script>
@@ -129,14 +129,11 @@ Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">
 </ul>
 <hr>
 <h3 id="host-messages">Host Messages</h3>
-<p>After each move, wait for a message from the host:</p>
-<ul>
-<li>Status lines indicating the number of moves, steps, rounds.
-<li>A verified board you must use as the BRD.
+<p>After each move, wait for a message from the host, which may include:
+</p><ul><li>Status lines indicating the number of Moves, Steps, Rounds.
+<div><span id="MESS"></span></div>
 <li>If necessary:<ul><li>five new random chips(NEXT5).
 <li>The game is over.</li></ul>
-<!--li>The host increments the <code>Moves</code> counter: Move is accepted.</li>
-<li><code>Moves</code> counter remain unchanged for up to 10 seconds: Move is rejected. Try a different move.</li-->
 </ul>
 <hr>
 <h3 id="strict-output-constraints">Strict Output Constraints</h3>
@@ -144,12 +141,12 @@ Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">
 <ul>
 <li><strong>RN</strong>: Your response number. Start at <code>1</code> and increment by <code>1</code> on every subsequent message (e.g., <code>RN=1</code>, <code>RN=2</code>, ...).</li>
 <li><strong>SA</strong>: Move starting cell <code>[row, col]</code>.</li>
-<li><strong>FA</strong>: Move destination cell <code>[row, col]</code>.<br><strong>Format example:</strong></li>
-</ul>
+<li><strong>FA</strong>: Move destination cell <code>[row, col]</code>.<br><strong>Format example:</strong></li></ul>
 <p>RN=5 SA=[1,2] FA=[3,4]</p>
 <p><strong>CRITICAL:</strong> Output <strong>NO</strong> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p><hr>
-
-`;	
+`;
+if(p){document.getElementById("MESS").innerHTML = `<li>A verified board you must use as the BRD.`;}
+else{document.getElementById("MESS").innerHTML = `<ul><li>If the <code>Moves</code> counter does not change within 10 seconds, it means the move was rejected. Try making a different move.</li></ul>`;}
 let info=`
 <h3>In this buttons version:</h3>
 <h4> To make a move, press a button representing a SA chip, then press a FA button with a zero mark.</h4>
@@ -453,7 +450,7 @@ if(ox5>0)
 	}
 }
 
-if(xf=="") {
+/*if(xf=="") {
 	xx=qn + " steps are completed in round " + (rd+1) + "<br>Moves " + mn + "<br>";
 if(p==1) {	
 	xx = xx + "Verified board:<br>";
@@ -462,7 +459,7 @@ if(p==1) {
 }
 }
 else xx = xf+ "Moves " + mn + ", total steps " +(stp*rnd)+ "<br>";
-document.getElementById("OUT").innerHTML = xx;
+document.getElementById("OUT").innerHTML = xx;*/
 if(xf!="") { exit;}
 }
 alcl=1;
