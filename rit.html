@@ -2,11 +2,11 @@
 <script>
 const
 hm=8,	//size of a side of square table/board.
-kcb=2,	//how many of one digit types of chips are placed on the table	
+kcb=3,	//how many of one digit types of chips are placed on the table	
 emb=22,	//number of empty sells 22=64-42
 rnd=2,	//rounds number
 stp=2;	//number of steps in a round 
-p=0,	//1 - input in pairs and printing states of the board
+p=0,	//1 - input in pairs
 u=false;//statistic test mode
 
 </script>
@@ -41,26 +41,22 @@ a:link, a:visited {
 <td width=70%>
 <p align=left class=f16>
 <p align=left class=f16 id="MANUAL"></p>
-
-<p align=left class=F16 id="CELLS"></p>
-
-<p align=left class=F16 id="OUT"></p>
-<!--p hidden align=left class=F16 id="NEXT5"></p-->
 <div class=f16>
 <p align=left>
 <h3 id="constants-and-initial-state">Constants and Current State</h3>
 <ul>
-<li><strong>Board (<code>BRD</code>) Dimensions:</strong> <span id="HM"></span></li>
-<li><strong>Number of Types of Chips:</strong> <span id="KCB"></span></li>
-<li><strong>Empty Cells Number:</strong> <span id="EMB"></span></li>
-<li><strong>Steps Per Round:</strong> <span id="STEPS"></span></li>
-<li><strong>Target Rounds:</strong> <span id="RNDs"></span></li>
-<li><strong>Current Progress:<ul>
-<div hidden id="GO"><li><strong>The game is over. Many thanks!</strong></li></div>
-<li>Moves</strong> = <span id="MVs"></span>,<li><span id="CSTEPS"></span> <strong>Steps are completed in the Round</strong> <span id="RNDn"></span></li></li></li></ul>
-<li><strong>Current Board (<code>BRD</code>):
-<div id="bs"></div></strong></li>
-<li><strong>The Next Five Chips(<code>NEXT5</code>):</strong> <span id="NEXT5"></span></li>
+<li><b>Board (<code>BRD</code>) Dimensions:</b> <span id="HM"></span></li>
+<li><b>Number of Types of Chips:</b> <span id="KCB"></span></li>
+<li><b>Empty Cells Number:</b> <span id="EMB"></span></li>
+<li><b>Steps Per Round:</b> <span id="STEPS"></span></li>
+<li><b>Target Rounds:</b> <span id="RNDs"></span></li>
+<li><b>Current Progress:<ul>
+<div hidden id="GO"><li><b>The game is over. Many thanks!</b></li></div>
+<li>Moves</b> = <span id="MVs"></span>,</li>
+<li><span id="CSTEPS"></span> <b>Steps are completed in the Round</b> <span id="RNDn"></span></li>
+<li><b>Current Board (<code>BRD</code>):
+<div id="bs"></div></b></li>
+<li><b>The Next Five Chips(<code>NEXT5</code>):</b> <span id="NEXT5"></span></li>
 </ul>
 </p></div>
 <p align=left class=f16></p><p align=left class=F16 id="INFO"></p>
@@ -82,12 +78,30 @@ for (i = 0; i < hm; i++){
 }
 
 for (i = 0; i < 5; i++){n5[i] = 0;}
+if(p) tim = ''; else tim = 'for 60 seconds';
+let messa;
 
+const soc = `<h3 id="strict-output-constraints">Strict Output Constraints</h3>
+<p>For <b>EVERY</b> response, you must output <b>ONLY</b> a single line conforming to this exact regex:<code>\/&lt;p&gt;RN=\\d+\\sSA=\\[\\d+,\\d+\\]\\sFA=\\[\\d+,\\d+\\]&lt;\/p&gt;\/</code></p>
+<ul>
+<li><b>RN</b>: Your response number. Start at <code>1</code> and increment by <code>1</code> on every subsequent message (e.g., <code>RN=1</code>, <code>RN=2</code>, ...).</li>
+<li><b>SA</b>: Move starting cell <code>[row, col]</code>.</li>
+<li><b>FA</b>: Move destination cell <code>[row, col]</code>.<br><b>Format example:</b></li></ul>
+<p>RN=5 SA=[1,2] FA=[3,4]</p>
+<p><b>CRITICAL:</b> Output <b>NO</b> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p></ul>`;
+let insert = tim +` after your move, it means the move was  erroneous. Try making a different move.</li>
+</ul><li>The <b>Current board</b> you <b>must</b> use as the <b>BRD</b>.</li>
+<li>If necessary:<ul>
+	<li>five new random chips(NEXT5).</li>
+	<li>The game is over.</li></ul>
+</li></ul><hr>`;
+if(p){messa = insert + soc;}
+else{messa = insert;}
 <!-- use a md to html converter
 document.getElementById("MANUAL").innerHTML = `
-Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">Source https://ogrnv.github.io/rit.html</a><br><br>
+<b>Let’s play RIT:</b><br><a href="https://ogrnv.github.io/rit.html" target="_blank">Source https://ogrnv.github.io/rit.html</a><br><br>
 <h3 id="game-overview--role">Game Overview &amp; Role</h3>
-<p>You are the sole player in a grid-based puzzle game. You make the first move.<br>Your goal is to complete the target number of <strong>Rounds</strong> in the fewest total <strong>Moves</strong> possible.</p><hr>
+<p>You are the sole player in a grid-based puzzle game. You make the first move.<br>Your goal is to complete the target number of <b>Rounds</b> in the fewest total <b>Moves</b> possible.</p><hr>
 <h3 id="grid--coordinate-system">Grid &amp; Coordinate System</h3>
 <ul>
 <li>The board (<code>BRD</code>) is a 2D grid.</li>
@@ -99,58 +113,41 @@ Let’s play RIT:<br><a href="https://ogrnv.github.io/rit.html" target="_blank">
 </li>
 </ul><hr>
 <h3 id="movement-rules">Movement Rules</h3>
-<p>A single <strong>Move</strong> consists of relocating one chip from a start address (<code>SA</code>) to a finish address (<code>FA</code>):</p>
+<p>A single <b>Move</b> consists of relocating one chip from a start address (<code>SA</code>) to a finish address (<code>FA</code>):</p>
 <ol>
 <li><code>BRD[SA]</code> must contain a chip (value <code>&gt; 0</code>).</li>
 <li><code>BRD[FA]</code> must be empty (value <code>0</code>).</li>
 <li><code>SA</code> cannot equal <code>FA</code>.</li>
 <li>Think about the next moves, not the ones left in the past.  </li>
-<li><strong>Relocation Path Requirement</strong>: There must be an unobstructed orthogonal path (up, down, left, right) connecting <code>SA</code> to <code>FA</code>, consisting of <strong>zero or more empty cells</strong> between <code>SA</code> and <code>FA</code>.</li>
+<li><b>Relocation Path Requirement</b>: There must be an unobstructed orthogonal path (up, down, left, right) connecting <code>SA</code> to <code>FA</code>, consisting of <b>zero or more empty cells</b> between <code>SA</code> and <code>FA</code>.</li>
 </ol>
 <hr>
 <h3 id="rounds-steps--win-condition">Rounds, Steps &amp; Win Condition</h3>
 <ul>
-<li><p>A <strong>Step</strong> is completed when <strong>your move</strong> creates a straight line (horizontal, vertical, or diagonal) of <strong>5 or more identical chips</strong>.</p>
+<li><p>A <b>Step</b> is completed when <b>your move</b> creates a straight line (horizontal, vertical, or diagonal) of <b>5 or more identical chips</b>.</p>
 </li>
 <li><p>A step can consist of one or more moves.</p>
 </li>
-<li><p>Any completed Round consists of <strong>Steps Per Round</strong> steps.</p>
+<li><p>Any completed Round consists of <b>Steps Per Round</b> steps.</p>
 </li>
-<li><p>When a Step is complete but the Round has not yet ended, the host performs the following actions:</p>
+<li>The host performs the following actions:
+<ul><li>When a Step is complete but the Round has not yet ended:
 <ol>
 <li>Five successive chips on the line are cleared (for cases with long or/and several line(s) five successive chips are chosen randomly).</li>
 <li>Five previewed chips from <code>NEXT5</code> are placed randomly onto free <code>BRD</code> cells.</li>
 </ol>
 </li>
-<li><p>After both Step and Round have been completed, the host performs the following actions:<br><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</p>
-</li>
-<li><p>The game ends after the completion of the last step in the last of the target <strong>rounds</strong>.</p>
-</li>
-</ul>
-<hr>
+<li>After both Step and Round have been completed:<ul><li><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</li></ul>
+</li></ul>
+<li><p>The game ends after the completion of the last step in the last of the <b>Target Rounds</b>.</p></li></ul><hr>
+
 <h3 id="host-messages">Host Messages</h3>
-<p>After each move, wait for a message from the host, which may include:
-</p><ul><li>Status lines indicating the number of Moves, Steps, Rounds.
-<div><span id="MESS"></span></div>
-<li>If necessary:<ul><li>five new random chips(NEXT5).
-<li>The game is over.</li></ul>
-</ul>
-<hr>
-<h3 id="strict-output-constraints">Strict Output Constraints</h3>
-<p>For <strong>EVERY</strong> response, you must output <strong>ONLY</strong> a single line conforming to this exact regex:<code>\/&lt;p&gt;RN=\\d+\\sSA=\\[\\d+,\\d+\\]\\sFA=\\[\\d+,\\d+\\]&lt;\/p&gt;\/</code></p>
-<ul>
-<li><strong>RN</strong>: Your response number. Start at <code>1</code> and increment by <code>1</code> on every subsequent message (e.g., <code>RN=1</code>, <code>RN=2</code>, ...).</li>
-<li><strong>SA</strong>: Move starting cell <code>[row, col]</code>.</li>
-<li><strong>FA</strong>: Move destination cell <code>[row, col]</code>.<br><strong>Format example:</strong></li></ul>
-<p>RN=5 SA=[1,2] FA=[3,4]</p>
-<p><strong>CRITICAL:</strong> Output <strong>NO</strong> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p><hr>
-`;
-if(p){document.getElementById("MESS").innerHTML = `<li>A verified board you must use as the BRD.`;}
-else{document.getElementById("MESS").innerHTML = `<ul><li>If the <code>Moves</code> counter does not change within 10 seconds, it means the move was rejected. Try making a different move.</li></ul>`;}
+After each move, wait for a message in the <b>Current Progress (of Constants and Current State)</b>, which includes:<ul><li>Status lines indicating the number of Moves, Steps, Rounds.</li><ul><li>If the <code>Moves</code> counter remains unchanged ` + messa;
 let info=`
-<h3>In this buttons version:</h3>
-<h4> To make a move, press a button representing a SA chip, then press a FA button with a zero mark.</h4>
-<p class=f16><strong>Submit your first move now.</strong></p>
+<hr><h3>In this buttons version:</h3>
+<h4><ul><li>All chips and empty cells are represented by buttons.</li>
+<li>To make a move, press a non-zero marked SA button, then press a FA button with a zero mark.</li></ul></h4>
+<h3 class=f16>Make your first move now.</h3>
 <br><br>`;
 function handleClick(e) {// handler as a named function
   const target = e.target;
@@ -450,16 +447,16 @@ if(ox5>0)
 	}
 }
 
-/*if(xf=="") {
-	xx=qn + " steps are completed in round " + (rd+1) + "<br>Moves " + mn + "<br>";
+if(xf=="") {
+	//xx=qn + " steps are completed in round " + (rd+1) + "<br>Moves " + mn + "<br>";
 if(p==1) {	
-	xx = xx + "Verified board:<br>";
-	for (i=0; i<hm; i++) xx=xx+Csb[i]+"<br>";
+	//xx = xx + "Verified board:<br>";
+	//for (i=0; i<hm; i++) xx=xx+Csb[i]+"<br>";
 	document.getElementById("NEXT5").innerHTML = sn5;
 }
 }
-else xx = xf+ "Moves " + mn + ", total steps " +(stp*rnd)+ "<br>";
-document.getElementById("OUT").innerHTML = xx;*/
+else //xx = xf+ "Moves " + mn + ", total steps " +(stp*rnd)+ "<br>";
+//document.getElementById("OUT").innerHTML = xx;
 if(xf!="") { exit;}
 }
 alcl=1;
