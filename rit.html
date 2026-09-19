@@ -4,11 +4,12 @@ const
 hm=8,	//size of a side of square table/board.
 kcb=3,	//how many of one digit types of chips are placed on the table	
 emb=22,	//number of empty sells 22=64-42
-rnd=2,	//rounds number
+rnd=5,	//rounds number
 stp=2;	//number of steps in a round 
-p=0,	//1 - input in pairs
+p=1,	//1 - input in pairs
 u=false;//statistic test mode
-
+/*Depending on whether we consider nodes touching at the corners connected or not, we have two variations: eight-way and four-way respectively.
+Four-way connectivity on a 2D grid allows movement between a cell and its four immediate neighbors: up, down, left, and right. This means from any given cell, you can traverse to any of these adjacent cells if they are not blocked by obstacles.*/
 </script>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -50,13 +51,13 @@ a:link, a:visited {
 <li><b>Empty Cells Number:</b> <span id="EMB"></span></li>
 <li><b>Steps Per Round:</b> <span id="STEPS"></span></li>
 <li><b>Target Rounds:</b> <span id="RNDs"></span></li>
-<li><b>Current Progress:<ul>
+<li><b>Current Progress:<ul><div id="OUT">
 <div hidden id="GO"><li><b>The game is over. Many thanks!</b></li></div>
 <li>Moves</b> = <span id="MVs"></span>,</li>
 <li><span id="CSTEPS"></span> <b>Steps are completed in the Round</b> <span id="RNDn"></span></li>
 <li><b>Current Board (<code>BRD</code>):
 <div id="bs"></div></b></li>
-<li><b>The Next Five Chips(<code>NEXT5</code>):</b> <span id="NEXT5"></span></li>
+<li><b>The Next Five Chips(<code>NEXT5</code>):</b> <span id="NEXT5"></span></li></div>
 </ul>
 </p></div>
 <p align=left class=f16></p><p align=left class=F16 id="INFO"></p>
@@ -112,32 +113,30 @@ document.getElementById("MANUAL").innerHTML = `
 </ul>
 </li>
 </ul><hr>
-<h3 id="movement-rules">Movement Rules</h3>
-<p>A single <b>Move</b> consists of relocating one chip from a start address (<code>SA</code>) to a finish address (<code>FA</code>):</p>
-<ol>
-<li><code>BRD[SA]</code> must contain a chip (value <code>&gt; 0</code>).</li>
-<li><code>BRD[FA]</code> must be empty (value <code>0</code>).</li>
+<h3 id="movement-rules">Movement Rules</h3><p>
+<ul><li><b>EM</b>: Relocation a chip to an adjacent empty cell (up/down/left/right) with swapping BRD[from] BRD[to] values.</li>
+<li><b>Move</b>: Either a single EM or a chain of EMs.</li>
+<li><b><code>SA</code></b>: A Move start address. <code>BRD[SA] &gt; 0</code>.</li>
+<li><b><code>FA</code></b>: A Move finish address. <code>BRD[FA] = 0</code>.</li>
 <li><code>SA</code> cannot equal <code>FA</code>.</li>
-<li>Think about the next moves, not the ones left in the past.  </li>
-<li><b>Relocation Path Requirement</b>: There must be an unobstructed orthogonal path (up, down, left, right) connecting <code>SA</code> to <code>FA</code>, consisting of <b>zero or more empty cells</b> between <code>SA</code> and <code>FA</code>.</li>
-</ol>
+<li>Advice: Think about the next moves, not the ones left in the past.</li>
+</ul>
 <hr>
 <h3 id="rounds-steps--win-condition">Rounds, Steps &amp; Win Condition</h3>
 <ul>
 <li><p>A <b>Step</b> is completed when <b>your move</b> creates a straight line (horizontal, vertical, or diagonal) of <b>5 or more identical chips</b>.</p>
 </li>
-<li><p>A step can consist of one or more moves.</p>
-</li>
+<ul><li>A step can consist of one or more moves.</li></ul>
 <li><p>Any completed Round consists of <b>Steps Per Round</b> steps.</p>
 </li>
-<li>The host performs the following actions:
-<ul><li>When a Step is complete but the Round has not yet ended:
+<li>The host performs the following actions when a Step is complete:
+<ul><li>Round has not yet ended:
 <ol>
 <li>Five successive chips on the line are cleared (for cases with long or/and several line(s) five successive chips are chosen randomly).</li>
 <li>Five previewed chips from <code>NEXT5</code> are placed randomly onto free <code>BRD</code> cells.</li>
 </ol>
 </li>
-<li>After both Step and Round have been completed:<ul><li><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</li></ul>
+<li>Round have been completed:<ul><li><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</li></ul>
 </li></ul>
 <li><p>The game ends after the completion of the last step in the last of the <b>Target Rounds</b>.</p></li></ul><hr>
 
