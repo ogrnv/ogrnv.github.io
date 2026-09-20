@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <script>
 const
+p=0,	//1 - input in pairs
 hm=8,	//size of a side of square table/board.
 kcb=3,	//how many of one digit types of chips are placed on the table	
 emb=22,	//number of empty sells 22=64-42
 rnd=5,	//rounds number
 stp=2;	//number of steps in a round 
-p=1,	//1 - input in pairs
 u=false;//statistic test mode
-/*Depending on whether we consider nodes touching at the corners connected or not, we have two variations: eight-way and four-way respectively.
-Four-way connectivity on a 2D grid allows movement between a cell and its four immediate neighbors: up, down, left, and right. This means from any given cell, you can traverse to any of these adjacent cells if they are not blocked by obstacles.*/
+
 </script>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -86,11 +85,10 @@ const soc = `<h3 id="strict-output-constraints">Strict Output Constraints</h3>
 <p>For <b>EVERY</b> response, you must output <b>ONLY</b> a single line conforming to this exact regex:<code>\/&lt;p&gt;RN=\\d+\\sSA=\\[\\d+,\\d+\\]\\sFA=\\[\\d+,\\d+\\]&lt;\/p&gt;\/</code></p>
 <ul>
 <li><b>RN</b>: Your response number. Start at <code>1</code> and increment by <code>1</code> on every subsequent message (e.g., <code>RN=1</code>, <code>RN=2</code>, ...).</li>
-<li><b>SA</b>: Move starting cell <code>[row, col]</code>.</li>
-<li><b>FA</b>: Move destination cell <code>[row, col]</code>.<br><b>Format example:</b></li></ul>
-<p>RN=5 SA=[1,2] FA=[3,4]</p>
-<p><b>CRITICAL:</b> Output <b>NO</b> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p></ul>`;
-let insert = tim +` after your move, it means the move was  erroneous. Try making a different move.</li>
+<li><b>Format example:</b></li>
+<p>RN=5 SA=[1,2] FA=[3,4]</p></ul>
+<p><b>CRITICAL:</b> Output <b>NO</b> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p></ul><hr>`;
+let insert = tim +` after your move, it means the move was incorrect. Try making a different move.</li>
 </ul><li>The <b>Current board</b> you <b>must</b> use as the <b>BRD</b>.</li>
 <li>If necessary:<ul>
 	<li>five new random chips(NEXT5).</li>
@@ -106,7 +104,7 @@ document.getElementById("MANUAL").innerHTML = `
 <h3 id="grid--coordinate-system">Grid &amp; Coordinate System</h3>
 <ul>
 <li>The board (<code>BRD</code>) is a 2D grid.</li>
-<li>A cell address is formatted as <code>[row, col]</code>, both indexed from <code>0</code>.</li>
+<li>A cell address is formatted as <code>[row,col]</code>, both indexed from <code>0</code>.</li>
 <li>Cell values:<ul>
 <li><code>0</code>: Empty cell.</li>
 <li>An integer <code>&gt; 0</code>: A chip marked with that integer (representing its color/type).</li>
@@ -119,33 +117,32 @@ document.getElementById("MANUAL").innerHTML = `
 <li><b><code>SA</code></b>: A Move start address. <code>BRD[SA] &gt; 0</code>.</li>
 <li><b><code>FA</code></b>: A Move finish address. <code>BRD[FA] = 0</code>.</li>
 <li><code>SA</code> cannot equal <code>FA</code>.</li>
-<li>Advice: Think about the next moves, not the ones left in the past.</li>
+<li>Recommendation: Think about the next moves, not the ones left in the past.</li>
 </ul>
 <hr>
 <h3 id="rounds-steps--win-condition">Rounds, Steps &amp; Win Condition</h3>
 <ul>
 <li><p>A <b>Step</b> is completed when <b>your move</b> creates a straight line (horizontal, vertical, or diagonal) of <b>5 or more identical chips</b>.</p>
 </li>
-<ul><li>A step can consist of one or more moves.</li></ul>
+<ul><li>Such step can consist of one or more moves.</li></ul>
 <li><p>Any completed Round consists of <b>Steps Per Round</b> steps.</p>
 </li>
 <li>The host performs the following actions when a Step is complete:
-<ul><li>Round has not yet ended:
+<ul><li>But the round is not yet over:
 <ol>
 <li>Five successive chips on the line are cleared (for cases with long or/and several line(s) five successive chips are chosen randomly).</li>
 <li>Five previewed chips from <code>NEXT5</code> are placed randomly onto free <code>BRD</code> cells.</li>
 </ol>
 </li>
-<li>Round have been completed:<ul><li><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</li></ul>
+<li>Round has been completed:<ul><li><code>BRD</code> and <code>NEXT5</code> are cleared  and randomly repopulated.</li></ul>
 </li></ul>
-<li><p>The game ends after the completion of the last step in the last of the <b>Target Rounds</b>.</p></li></ul><hr>
-
+<li><p>The game ends upon the completion of the last step in the final   round.</p></li></ul><hr>
 <h3 id="host-messages">Host Messages</h3>
-After each move, wait for a message in the <b>Current Progress (of Constants and Current State)</b>, which includes:<ul><li>Status lines indicating the number of Moves, Steps, Rounds.</li><ul><li>If the <code>Moves</code> counter remains unchanged ` + messa;
+After each move, wait for a message in the <b>Current Progress (of Constants and Current State)</b>, which includes:<ul><li>Status lines displaying the number of Moves, Steps, Rounds.</li><ul><li>If the <b><code>Moves</code></b> counter remains unchanged ` + messa;
 let info=`
 <hr><h3>In this buttons version:</h3>
 <h4><ul><li>All chips and empty cells are represented by buttons.</li>
-<li>To make a move, press a non-zero marked SA button, then press a FA button with a zero mark.</li></ul></h4>
+<li>To make a move, press a non-zero marked SA button, then press a FA button with a zero mark.</li></ul></h4><hr>
 <h3 class=f16>Make your first move now.</h3>
 <br><br>`;
 function handleClick(e) {// handler as a named function
@@ -198,8 +195,6 @@ n=0;
 while(n<5){	
 	n5[n]=random(1, kcb);
 	n++;}
-/*
-*/
 let s = ""; //for (i=0; i<hm; i++) s=s+Csb[i]+"<br>";
 //document.getElementById("CELLS").innerHTML = s;
 if(stp>1){for (i=0; i<4; i++) s=s+n5[i]+","; s=s+n5[4];
@@ -209,17 +204,13 @@ if(mn==0) {
 	document.getElementById("MVs").innerHTML = mn;
 	document.getElementById("INFO").innerHTML = info;
 	document.getElementById("HM").innerHTML = hm + "x" + hm;
-//	document.getElementById("HMm").innerHTML = hm + "x" + hm;
 	document.getElementById("EMB").innerHTML = emb;
 	document.getElementById("KCB").innerHTML = kcb;
-//	document.getElementById("STEPSS").innerHTML = stp;
 	document.getElementById("RNDs").innerHTML = rnd;
 	document.getElementById("STEPS").innerHTML = stp;
 	document.getElementById("RNDn").innerHTML = 1;
-
 	}
 }
-
 let btn = document.getElementById("bs");
 newdesk();
 // Create buttons
