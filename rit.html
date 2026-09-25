@@ -87,7 +87,7 @@ const soc = `<h3 id="strict-output-constraints">Strict Output Constraints</h3>
 <li><b>RN</b>: Your response number. Start at <code>1</code> and increment by <code>1</code> on every subsequent message (e.g., <code>RN=1</code>, <code>RN=2</code>, ...).</li>
 <li><b>Format example:</b></li>
 <p>RN=5 SA=[1,2] FA=[3,4]</p></ul>
-<p><b>CRITICAL:</b> Output <b>NO</b> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element.</p></ul><hr>`;
+<p><b>CRITICAL:</b> Output <b>NO</b> other text, markdown blocks (no \`\`\`), explanations, or reasoning. Output only the <code>&lt;p&gt;...&lt;/p&gt;</code> element satisfying the above-mentioned regex.</p></ul><hr>`;
 let insert = tim +` after your move, it means the move was incorrect. Try making a different move.</li>
 </ul><li>The <b>Current board</b> you <b>must</b> use as the <b>BRD</b>.</li>
 <li>If necessary:<ul>
@@ -107,7 +107,7 @@ document.getElementById("MANUAL").innerHTML = `
 <li>A cell address is formatted as <code>[row,col]</code>, both indexed from <code>0</code>.</li>
 <li>Cell values:<ul>
 <li><code>0</code>: Empty cell.</li>
-<li>An integer <code>&gt; 0</code>: A chip marked with that integer (representing its color/type).</li>
+<li>An integer <code>&gt; 0</code>: A chip marked with that integer (representing its type).</li>
 </ul>
 </li>
 </ul><hr>
